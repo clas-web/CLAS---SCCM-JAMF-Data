@@ -33,110 +33,118 @@ function onOpen() {
     var convertedFile = {
     title: file.getName()+"_"+currentDate,
     parents: [{ id: "1QudHKu0hpIK20lenJYLCG0Ent67SB-jY" }]
-    };
-    convertedFile = Drive.Files.insert(convertedFile,file, {
-    convert:true
-    });
-    
-    //convertedFile.parents
-    
-    //import Google Sheet
-    var SSSheets = SpreadsheetApp.openById(convertedFile.id)
-    // Get full range of data
-    var sheetRange = SSSheets.getDataRange();
-    // get the data values in range
-    var sheetData = sheetRange.getValues();
-    sheet.clear();
-    sheet.getRange(1, 1, SSSheets.getLastRow(), SSSheets.getLastColumn()).setValues(sheetData);     
+  };
+convertedFile = Drive.Files.insert(convertedFile,file, {
+  convert:true
+});
 
-      //Update A1 with note featuring the date of the import
-      sheet.getRange("A1").setNote("Imported " + currentDate);
+//convertedFile.parents
 
-    } else {
-    Logger.log("Not an Excel file");
-    }
-    
-    }
-    //******************************************************************************************************************************************************
-    //******************************************************************************************************************************************************
-    //******************************************************************************************************************************************************
-    function importJAMF(){
-    
-    id = "17r2ViM2qQj-E800ep20Rr_xHMb2t5wjG"; //JAMF Excel file with datafeed
-    var currentDate = new Date();
-    var file = DriveApp.getFileById(id);
-    Logger.log(file.getMimeType());
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Casper (live import)");
-    
-    // Is the attachment an Excel file?  
-    if (file.getMimeType() == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"){
+//import Google Sheet
+var SSSheets = SpreadsheetApp.openById(convertedFile.id)
+// Get full range of data
+var sheetRange = SSSheets.getDataRange();
+// get the data values in range
+var sheetData = sheetRange.getValues();
+sheet.clear();
+sheet.getRange(1, 1, SSSheets.getLastRow(), SSSheets.getLastColumn()).setValues(sheetData);     
+
+//Update A1 with note featuring the date of the import
+sheet.getRange("A1").setNote("Imported " + currentDate);
+
+} else {
+  Logger.log("Not an Excel file");
+}
+
+//Add warranty check for serial numbers
+hyperlink(sheet.getRange("G2:G"));
+
+}
+//******************************************************************************************************************************************************
+//******************************************************************************************************************************************************
+//******************************************************************************************************************************************************
+function importJAMF(){
+  
+  //id = "17r2ViM2qQj-E800ep20Rr_xHMb2t5wjG"; //JAMF Excel xml file with datafeed, not working as of Jan 19
+  id = "1EgQLzzIQNbq7RfxHuoBsatDckREeplKM"; //JAMF Excel query file with datafeed
+  var currentDate = new Date();
+  var file = DriveApp.getFileById(id);
+  Logger.log(file.getMimeType());
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Casper (live import)");
+  
+  // Is the attachment an Excel file?  
+  if (file.getMimeType() == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"){
     Logger.log("Excel sheet found, importing...");
     //convert to Google Sheet
     var convertedFile = {
-    title: file.getName()+"_"+currentDate,
-    parents: [{ id: "1QudHKu0hpIK20lenJYLCG0Ent67SB-jY" }]
-    };
-    convertedFile = Drive.Files.insert(convertedFile,file, {
+      title: file.getName()+"_"+currentDate,
+      parents: [{ id: "1QudHKu0hpIK20lenJYLCG0Ent67SB-jY" }]
+  };
+  convertedFile = Drive.Files.insert(convertedFile,file, {
     convert:true
-    });
-    
-    //convertedFile.parents
-    
-    //import Google Sheet
-    var SSSheets = SpreadsheetApp.openById(convertedFile.id)
-    // Get full range of data
-    var sheetRange = SSSheets.getDataRange();
-    // get the data values in range
-    var sheetData = sheetRange.getValues();
-    sheet.clear();
-    sheet.getRange(1, 1, SSSheets.getLastRow(), SSSheets.getLastColumn()).setValues(sheetData); 
-      
-      //Update A1 with note featuring the date of the import
-      sheet.getRange("A1").setNote("Imported " + currentDate);
-      
-    } else {
-    Logger.log("Not an Excel file");
-    }
-    
-    }
-    
-    //******************************************************************************************************************************************************
-    //******************************************************************************************************************************************************
-    //******************************************************************************************************************************************************
-    
-    function clone_SG_GoogleSheet() {
-    
-    var date = new Date();
-    var name = 'SCCM_'+ date;
-    var folderId = '1QudHKu0hpIK20lenJYLCG0Ent67SB-jY';
-    var resource = {
+  });
+  
+  //convertedFile.parents
+  
+  //import Google Sheet
+  var SSSheets = SpreadsheetApp.openById(convertedFile.id)
+  // Get full range of data
+  var sheetRange = SSSheets.getDataRange();
+  // get the data values in range
+  var sheetData = sheetRange.getValues();
+  sheet.clear();
+  sheet.getRange(1, 1, SSSheets.getLastRow(), SSSheets.getLastColumn()).setValues(sheetData); 
+  
+  //Update A1 with note featuring the date of the import
+  sheet.getRange("A1").setNote("Imported " + currentDate);
+  
+} else {
+  Logger.log("Not an Excel file");
+}
+
+//Add warranty check for serial numbers
+hyperlink(sheet.getRange("C2:C"));
+//Add direct link to Casper
+hyperlinkCasper(sheet.getRange("A2:A"), sheet.getRange("M2:M"));
+}
+
+//******************************************************************************************************************************************************
+//******************************************************************************************************************************************************
+//******************************************************************************************************************************************************
+
+function clone_SG_GoogleSheet() {
+  
+  var date = new Date();
+  var name = 'SCCM_'+ date;
+  var folderId = '1QudHKu0hpIK20lenJYLCG0Ent67SB-jY';
+  var resource = {
     title: name,
     mimeType: MimeType.GOOGLE_SHEETS,
     parents: [{ id: folderId }]
   }
-var fileJson = Drive.Files.insert(resource);
-var fileId = fileJson.id;
-
-var source = SpreadsheetApp.getActiveSpreadsheet();
-
-var sheet = source.getSheetByName('SCCM (live import)');
-removeEmptyColumns();
-removeEmptyRows();
-
-var destination = SpreadsheetApp.openById(fileId);
-
-sheet.copyTo(destination);
-
-var sheet1 = destination.getSheetByName('Sheet1');
-destination.deleteSheet(sheet1);
-
-removeEmptyColumns();
-removeEmptyRows();
-
-//******************************************************************************************************************************************************
-//******************************************************************************************************************************************************
-//******************************************************************************************************************************************************
-
+  var fileJson = Drive.Files.insert(resource);
+  var fileId = fileJson.id;
+  
+  var source = SpreadsheetApp.getActiveSpreadsheet();
+  
+  var sheet = source.getSheetByName('SCCM (live import)');
+  removeEmptyColumns();
+  removeEmptyRows();
+  
+  var destination = SpreadsheetApp.openById(fileId);
+  
+  sheet.copyTo(destination);
+  
+  var sheet1 = destination.getSheetByName('Sheet1');
+  destination.deleteSheet(sheet1);
+  
+  removeEmptyColumns();
+  removeEmptyRows();
+  
+  //******************************************************************************************************************************************************
+  //******************************************************************************************************************************************************
+  //******************************************************************************************************************************************************
+  
 }
 
 function clone_Casper_GoogleSheet() {
@@ -169,11 +177,11 @@ function clone_Casper_GoogleSheet() {
 }
 
 //https://productforums.google.com/forum/#!msg/docs/-2mGCzmUIkY/TwBwiX4OT4QJ
-function sheetnames() { // ahab facit 2011
-  var out = new Array()
+function sheetnames() { 
+  var out = new Array();
   var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
-  for (var i=0 ; i<sheets.length ; i++) out.push( [ sheets[i].getName() ] )
-  return out  
+  for (var i=0 ; i<sheets.length ; i++) out.push( [ sheets[i].getName() ] );
+  return out;  
   
 }
 
